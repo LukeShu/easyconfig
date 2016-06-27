@@ -3,9 +3,6 @@
 package adaptflag
 
 import "fmt"
-import "flag"
-import "github.com/ogier/pflag"
-import "gopkg.in/alecthomas/kingpin.v2"
 import "gopkg.in/hlandau/configurable.v1"
 import "strings"
 
@@ -173,23 +170,6 @@ type Value interface {
 func AdaptWithFunc(f AdaptFunc) {
 	configurable.Visit(func(c configurable.Configurable) error {
 		return recursiveAdapt(nil, c, f)
-	})
-}
-
-// Adapt registers all registered configurables as flags with the flag and
-// ogier/pflag packages. Note that Adapt will not do anything with
-// Configurables which it has already adapted once, thus it is safe to call
-// this function multiple times.
-func Adapt() {
-	AdaptWithFunc(func(info Info) {
-		dpn := DottedPath(info.Path)
-		if len(dpn) > 0 {
-			dpn += "."
-		}
-		dpn += info.Name
-		flag.Var(info.Value, dpn, info.Usage)
-		pflag.Var(info.Value, dpn, info.Usage)
-		kingpin.Flag(dpn, info.Usage).SetValue(info.Value)
 	})
 }
 
